@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home | Perfect Med{% endblock %}
+
+{% block body %}
+    <nav>
+        <div class="nav-wrapper">
+        <a href="#" class="brand-logo">Logo</a>
+        <ul id="nav-mobile" class="right hide-on-med-and-down">
+
+            <li><a href="sass.html">About us</a></li>
+        {% if logged is defined %}
+            <li><a>Your visits</a></li>
+            <li><a>New visit</a></li>
+        {% else %}
+            <li><a href={{ path("sign_in") }}>Sign in</a></li>
+        {% endif %}
+        </ul>
+        </div>
+    </nav>    
+    <h1>Welome to home page</h1>
+{% endblock %}

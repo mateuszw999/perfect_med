@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign in | Perfect Med{% endblock %}
+
+{% block body %}
+<form method='POST' class="sign_in_form">
+
+    <input class="text-input text-input--material" name="login" placeholder="username or email" type="text">
+    <br />
+    <input class="text-input text-input--material" name="password" placeholder="password" type="password">
+   
+    {% if empty_imputs is defined %}
+        Please fill empty imputs
+    {% endif %}
+
+    {% if incorrect_data is defined %}
+        Incorrect login or password
+    {% endif %}
+
+    <input type="checkbox" class="filled-in" name="stay_logged"/>
+    <label for="stay_logged">Remember me</label>
+    <input type='submit' class="sign_in_form_submit" value='log in' name="submit">
+</form>
+{% endblock %}
