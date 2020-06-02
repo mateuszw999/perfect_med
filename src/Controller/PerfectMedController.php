@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface; 
 use Doctrine\ORM\Query;
+use Symfony\Component\HttpFoundation\Cookie;
 
 use App\Entity\Users;
 
@@ -29,7 +30,11 @@ class PerfectMedController extends AbstractController{
                         ->findAll();
 
             foreach ($users as $user) {
-                if($_COOKIE["user_code"] === $user->getCode() || $this->session->get("user_code") === $user->getCode()){
+                if (isset($_COOKIE["user_code"])) {
+                    if($_COOKIE["user_code"] === $user->getCode()){
+                        return $this->redirect("/" . $user->getUsername());
+                    }
+                } elseif($this->session->get("user_code") === $user->getCode()){
                     return $this->redirect("/" . $user->getUsername());
                 }
             }
@@ -77,14 +82,16 @@ class PerfectMedController extends AbstractController{
                 foreach ($users as $user) {
                     if((trim($_POST['login']) === $user->getUsername() || trim($_POST['login']) === $user->getEmail()) && $_POST['password'] === $user->getPassword()){
 
-                        if (isset($_POST["stay_logged"])) {     
-                            setcookie("user_code", $user->getCode(), null, "/");
+                        if (isset($_POST["stay_logged"])) {   
+                            setcookie("user_code", $user->getCode(), time() + 86400 * 365, "/");
                             $this->session->set("user_code", $user->getCode());
+                            // $response = new Response();
+                            // $response->headers->setCookie(Cookie::create('user_code', $user->getCode(), 86400 * 365, "/"));
                         } else {
                             $this->session->set("user_code", $user->getCode());
                         }
                         // return new Response (var_dump($_COOKIE['user_code']));
-                        return $this->redirect("/$user->getUsername()");
+                        return $this->redirect("/{$user->getUsername()}");
                     }
                 }
             }
@@ -112,7 +119,11 @@ class PerfectMedController extends AbstractController{
         if(isset($_COOKIE['user_code']) || $this->session->get("user_code")){
 
                 foreach($users as $user){
-                    if(($this->session->get("user_code") === $user->getCode() || $_COOKIE["user_code"] === $user->getCode()) && $username === $user->getUsername()){
+                    if (isset($_COOKIE["user_code"])) {
+                        if($_COOKIE["user_code"] === $user->getCode()){
+                            return $this->render("perfect_med/index.html.twig", ["logged" => true]);
+                        }
+                    } elseif($this->session->get("user_code") === $user->getCode()){
                         return $this->render("perfect_med/index.html.twig", ["logged" => true]);
                     }
                 }
