@@ -12,8 +12,12 @@
         {% if logged is defined %}
             <li><a>Your visits</a></li>
             <li><a>New visit</a></li>
+            <form method="POST">
+                <li><input type='submit' name='logged_out' value='Log Out'></input></li>
+            </form>
         {% else %}
             <li><a href={{ path("sign_in") }}>Sign in</a></li>
+            <li><a href={{ path("sign_up") }}>Sign up</a></li>
         {% endif %}
         </ul>
         </div>

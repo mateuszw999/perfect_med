@@ -5,14 +5,18 @@
 {% block body %}
 <form method='POST' class="sign_up_form">
 
-    <input class="text-input text-input--material" name="login" placeholder="username or email" type="text">
+    <input class="text-input text-input--material" name="username" placeholder="username" type="text" {% if username is defined %} value={{ username }} {% endif %}>
     <br />
-    <input class="text-input text-input--material" name="password" placeholder="password" type="password">
+    <input class="text-input text-input--material" name="email" placeholder="email" type="text" {% if username is defined %} value={{ email }} {% endif %}>
     <br />
-    <input class="text-input text-input--material" name="repeat_password" placeholder="password" type="password">
+    <input class="text-input text-input--material" name="password" placeholder="password" type="password" {% if username is defined %} value={{ password }} {% endif %}>
+    <br />
+    <input class="text-input text-input--material" name="repeat_password" placeholder="password" type="password" {% if username is defined %} value={{ repeat_password }} {% endif %}>
    
-    {% if error is defined %}
-        {{ error }}
+    {% if errors is defined %}
+        {% for error in errors %}
+            {{ error }}
+        {% endfor %}
     {% endif %}
 
     <input type='submit' class="sign_up_form_submit" value='log in' name="submit">

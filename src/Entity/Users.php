@@ -25,6 +25,10 @@ class Users {
      */
     private $username;
 
+    public function setUsername(string $username) {
+        $this->username = $username;
+    }
+
     public function getUsername() : string {
         return $this->username;
     }
@@ -33,6 +37,10 @@ class Users {
      * @ORM\Column(type="string")
      */
     private $password;
+
+    public function setPassword(string $password) {
+        $this->password = $password;
+    }
 
     public function getPassword() : string {
         return $this->password;
@@ -43,6 +51,10 @@ class Users {
      */
     private $email;
 
+    public function setemail(string $email) {
+        $this->email = $email;
+    }
+
     public function getEmail() : string {
         return $this->email;
     }
@@ -51,8 +63,25 @@ class Users {
      * @ORM\Column(type="string")
      */
     private $code;
+    
+    public function setCode(string $code) {
+        $this->code = $code;
+    }
 
     public function getCode() : string {
         return $this->code;
+    }
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $activated;
+
+    public function setActivated(bool $activated) {
+        $this->activated = $activated;
+    }
+
+    public function getActivated() : boolean {
+        return $this->activated; 
     }
 }

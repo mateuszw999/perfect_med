@@ -82,15 +82,12 @@ class PerfectMedController extends AbstractController{
                 foreach ($users as $user) {
                     if((trim($_POST['login']) === $user->getUsername() || trim($_POST['login']) === $user->getEmail()) && $_POST['password'] === $user->getPassword()){
 
-                        if (isset($_POST["stay_logged"])) {   
-                            setcookie("user_code", $user->getCode(), time() + 86400 * 365, "/");
+                        if (isset($_POST["stay_logged"])) {
+                            setcookie("user_code", $user->getCode(), time() + (86400 * 365), "/");
                             $this->session->set("user_code", $user->getCode());
-                            // $response = new Response();
-                            // $response->headers->setCookie(Cookie::create('user_code', $user->getCode(), 86400 * 365, "/"));
                         } else {
                             $this->session->set("user_code", $user->getCode());
                         }
-                        // return new Response (var_dump($_COOKIE['user_code']));
                         return $this->redirect("/{$user->getUsername()}");
                     }
                 }
@@ -104,6 +101,64 @@ class PerfectMedController extends AbstractController{
      * @Route("/sign_up", name="sign_up")
      */
     public function sign_up() {
+
+        if (isset($_POST['submit'])) {
+            
+            $errors = [];
+            $isFormValid = true;
+
+            if ($_POST["username"] == "" || $_POST["email"] == "" || $_POST["password"] == "" || $_POST["repeat_password"] == "") { 
+                $isFormValid = false;
+                $errors[] = "Fill empty inputs";
+            } else {
+                $users = $this->getDoctrine()
+                            ->getRepository(Users::class)
+                            ->findAll();
+                
+                foreach ($users as $user) {
+                    if($_POST["username"] === $user->getUsername()){
+                        $isFormValid = false;
+                        $errors[] = "This username is already taken";
+                    } 
+                    if($_POST["email"] === $user->getEmail()){
+                        $isFormValid = false;
+                        $errors[] = "This email is already taken";
+                    }
+                }
+
+                if (strlen($_POST["password"]) < 6) {
+                    $isFormValid = false;
+                    $errors[] = "Password must contain at least 6 characters";
+                } elseif ($_POST["password"] !== $_POST["repeat_password"]) {
+                    $isFormValid = false;
+                    $errors[] = "Passwords are different";
+                }
+            }
+            
+            if($isFormValid){
+                $entityManager = $this->getDoctrine()->getManager();
+
+                $user = new Users();
+                $user->setUsername($_POST['username']);
+                $user->setPassword($_POST['password']);
+                $user->setEmail($_POST["email"]);
+                $user->setCode(uniqid("") . uniqid("") . uniqid(""));
+                $user->setActivated(false);
+
+                $entityManager->persist($user);
+                $entityManager->flush();
+        
+            } else {
+                return $this->render("perfect_med/sign_up.html.twig", [
+                    "errors" => $errors,
+                    "username" => $_POST["username"],
+                    "email" => $_POST["email"],
+                    "password" => $_POST["password"],
+                    "repeat_password" => $_POST["repeat_password"]
+                ]);
+            }
+        }
+
         return $this->render("perfect_med/sign_up.html.twig");
     }
 
@@ -112,11 +167,18 @@ class PerfectMedController extends AbstractController{
      */
     public function home_page_logged($username) {
 
-        $users = $this->getDoctrine()
-                    ->getRepository(Users::class)
-                    ->findAll();
+        if(isset($_POST['logged_out'])){
+            setcookie("user_code", "", time()-1, "/");
+            if ($this->session->get("user_code")) {
+                $this->session->remove("user_code");
+            }
+            return $this->redirectToRoute("home_page");
+        }
         
         if(isset($_COOKIE['user_code']) || $this->session->get("user_code")){
+                 $users = $this->getDoctrine()
+                            ->getRepository(Users::class)
+                            ->findAll();
 
                 foreach($users as $user){
                     if (isset($_COOKIE["user_code"])) {
@@ -132,6 +194,7 @@ class PerfectMedController extends AbstractController{
 
         } else {
             return $this->redirectToRoute("home_page");
-        }
+        }   
+        
     }
 }
